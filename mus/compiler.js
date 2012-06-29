@@ -9,10 +9,16 @@ var compile = function(music) {
     return notes;
 
     function rec(expr, parent, time) {        // help method
-        if (expr.tag == 'note') { // base case
+        if (expr.tag == 'note') { // base case: note
             notes.push({ tag: 'note', pitch: expr.pitch, start: time, dur: expr.dur});
             return time + expr.dur;
-        } else if (expr.tag == 'par') { // recursive case: parallel
+        }
+        if (expr.tag == 'rest') { // base case: rest
+            notes.push({ tag: 'rest', duration: expr.duration});
+            return time + expr.duration;
+        }
+
+        if (expr.tag == 'par') { // recursive case: parallel
             var leftTime = rec(expr.left, 'par', time);
             var rightTime = rec(expr.right, 'par', time);
 
