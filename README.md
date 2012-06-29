@@ -1,4 +1,4 @@
 wenshan-compiler
 ================
 
-A compiler, written for fun
+A compiler, written in JavaScript, just for fun.
