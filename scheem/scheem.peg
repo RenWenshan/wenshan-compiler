@@ -16,16 +16,16 @@ expression_2 =
     {return atoms;}
 
 expression_3 =
-    space* '(' space* left:atomlist space* expr:expression* right:atomlist space* ')' space*
+    space* '(' space* left:atomlist space* expr:expression* space* right:atomlist space* ')' space*
     {return left.concat(expr).concat(right);}
-
 
 
 validchar =
     [0-9a-zA-Z_?!+\-=@#$%^&*/.]
 
 space =
-    ' '
+    WhiteSpace
+    / LineTerminator
 
 atom =
     chars:validchar+
@@ -38,3 +38,9 @@ spaceatom =
 atomlist =
     atoms:spaceatom*
     {return atoms;}
+
+WhiteSpace "whitespace"
+    = [\t\v\f \u00A0\uFEFF]
+
+LineTerminator
+    = [\n\r\u2028\u2029]
