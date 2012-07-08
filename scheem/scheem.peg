@@ -1,0 +1,40 @@
+// parse an scheem expression
+start =
+    expression
+
+expression =
+    expression_1
+    / expression_2
+    / expression_3
+
+expression_1 =
+    space* '(' space* expr:expression space* ')' space*
+    {return expr;}
+
+expression_2 =
+    space* '(' space* atoms:atomlist space* ')' space*
+    {return atoms;}
+
+expression_3 =
+    space* '(' space* left:atomlist space* expr:expression* right:atomlist space* ')' space*
+    {return left.concat(expr).concat(right);}
+
+
+
+validchar =
+    [0-9a-zA-Z_?!+\-=@#$%^&*/.]
+
+space =
+    ' '
+
+atom =
+    chars:validchar+
+        { return chars.join(""); }
+
+spaceatom =
+    space* second:atom
+    {return second;}
+
+atomlist =
+    atoms:spaceatom*
+    {return atoms;}
