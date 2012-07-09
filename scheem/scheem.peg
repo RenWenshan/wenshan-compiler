@@ -3,29 +3,37 @@ start =
     expression
 
 expression =
-    expression_1
+    atom
+    / expression_4
+    / expression_1
     / expression_2
     / expression_3
 
+// simple expressions like (a b c)
 expression_1 =
     space* '(' space* expr:expression space* ')' space*
     {return expr;}
 
+// expressions with uesless parenthesis, such as ((a b c))
 expression_2 =
     space* '(' space* atoms:atomlist space* ')' space*
     {return atoms;}
 
+// normal expressions, contains atoms and expressions
 expression_3 =
     space* '(' space* left:atomlist space* expr:expression* space* right:atomlist space* ')' space*
     {return left.concat(expr).concat(right);}
 
+// quote expression
+expression_4 =
+    space* quote expr: expression space*
+    {return ["quote", expr]}
 
 validchar =
     [0-9a-zA-Z_?!+\-=@#$%^&*/.]
 
 space =
-    WhiteSpace
-    / LineTerminator
+    [ \t\r\n]
 
 atom =
     chars:validchar+
@@ -39,8 +47,6 @@ atomlist =
     atoms:spaceatom*
     {return atoms;}
 
-WhiteSpace "whitespace"
-    = [\t\v\f \u00A0\uFEFF]
+quote =
+    "'"
 
-LineTerminator
-    = [\n\r\u2028\u2029]
