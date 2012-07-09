@@ -6,8 +6,15 @@ comment =
     ";;" (!newline .)*
 
 expression =
-    atom
-    / expression_4
+    single_atom
+    / parenthesis_expression
+
+single_atom =
+    space* expr:atom space*
+    {return expr;}
+
+parenthesis_expression =
+    expression_4
     / expression_1
     / expression_2
     / expression_3
@@ -53,7 +60,7 @@ newline =
 
 atom =
     chars:validchar+
-        { return chars.join(""); }
+    { return chars.join(""); }
 
 spaceatom =
     space* second:atom
@@ -65,4 +72,3 @@ atomlist =
 
 quote =
     "'"
-
