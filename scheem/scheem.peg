@@ -2,6 +2,9 @@
 start =
     expression
 
+comment =
+    ";;" (!newline .)*
+
 expression =
     atom
     / expression_4
@@ -33,7 +36,20 @@ validchar =
     [0-9a-zA-Z_?!+\-=@#$%^&*/.]
 
 space =
-    [ \t\r\n]
+    whitespace
+    / table
+    / newline
+    / comment
+
+
+whitespace =
+    ' '
+
+table =
+    [\t]
+
+newline =
+    [\r\n]
 
 atom =
     chars:validchar+

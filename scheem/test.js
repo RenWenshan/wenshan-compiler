@@ -28,4 +28,8 @@ assert.deepEqual( parse("(+ (- 10 9) (* 2 6) 9 7)"),
 
 // Quotes handling test cases
 assert.deepEqual( parse("'x"), ["quote", "x"] );
-assert.deepEqual( parse("'(1 2 3)"), ["quote", ["1", "2", "3"]]);
+assert.deepEqual( parse("'(1 2 3)"), ["quote", ["1", "2", "3"]] );
+
+
+// Comments hanlding test cases
+assert.deepEqual( parse ("'(a b c) ;; quoting"), ["quote", ["a", "b", "c"]] );
