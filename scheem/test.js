@@ -26,6 +26,6 @@ assert.deepEqual( parse("(+ (- 10 9) (* 2 6) 9 7)"),
                   ["+", ["-", "10", "9"], ["*", "2", "6"], "9", "7"]
                 );
 
-// // Quotes handling test cases
-// assert.deepEqual( parse("'x"), ["quote", "x"] );
-// assert.deepEqual( parse("'(1 2 3)", ["quote", ["1", "2", "3"]]))
+// Quotes handling test cases
+assert.deepEqual( parse("'x"), ["quote", "x"] );
+assert.deepEqual( parse("'(1 2 3)"), ["quote", ["1", "2", "3"]]);
