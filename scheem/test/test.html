@@ -15,8 +15,28 @@
   <script>mocha.setup('tdd')</script>
   <script src="../parser.js"></script>
   <script src="../interpreter.js"></script>
-  <script src="interpreter_test.js"></script>
-  <script src="parser_test.js"></script>
+  <script src="test.js"></script>
+  <script>
+  var evalScheemString = function (str, env) {
+      return evalScheem(SCHEEM.parse(str), env);
+  };
+
+  suite('evalScheemString', function() {
+      test('(+ 1 2)', function() {
+          assert.deepEqual(
+              evalScheemString("(+ 1 2)", {}),
+              3
+          );
+      });
+      test("(* (car (cdr '(9 8 3 2))) 10)", function() {
+          assert.deepEqual(
+              evalScheemString("(* (car (cdr '(9 8 3 2))) 10)", {}),
+              80
+          );
+      });
+  });
+
+  </script>
   <script>
     $(function(){
       mocha.run();

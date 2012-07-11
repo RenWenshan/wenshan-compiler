@@ -1,5 +1,6 @@
 var assert = chai.assert;
 
+// interpreter tests
 suite('quote', function() {
     test('a number', function() {
         assert.deepEqual(
@@ -291,3 +292,45 @@ suite('exceptions', function() {
     });
 
 });
+
+
+// parser tests
+suite('parse', function() {
+    test('a number', function() {
+        assert.deepEqual(
+            SCHEEM.parse('42'),
+            42
+        );
+    });
+    test('a variable', function() {
+        assert.deepEqual(
+            SCHEEM.parse('x'),
+            'x'
+        );
+    });
+    test('a simple expression', function() {
+        assert.deepEqual(
+            SCHEEM.parse("(+ 2 3)"),
+            ['+', 2, 3]
+        );
+    })
+    test('an expression contains expressions', function() {
+        assert.deepEqual(
+            SCHEEM.parse('(* (+ 1 3) (/ 2 (- 8 9)))'),
+            ['*', ['+', 1, 3], ['/', 2, ['-', 8, 9]]]
+        );
+    });
+    test('an expression with cdr', function() {
+        assert.deepEqual(
+            SCHEEM.parse("(cdr '(1 2 3 4))"),
+            ['cdr', ['quote', [1, 2, 3, 4]]]
+        );
+    });
+    test('an expression contains whitespace', function() {
+        assert.deepEqual(
+            SCHEEM.parse("(   +   8      9)"),
+                         ['+', 8, 9]
+        );
+    });
+});
+
