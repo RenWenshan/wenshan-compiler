@@ -1,0 +1,49 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Scheem Tests</title>
+  <link rel="stylesheet"
+    href="http://nathansuniversity.com/css/mocha.css" />
+  <script src=
+    "http://nathansuniversity.com/js/jquery-1.7.1.min.js">
+  </script>
+  <script src=
+    "http://nathansuniversity.com/js/chai.js">
+  </script>
+  <script src="http://nathansuniversity.com/js/mocha.js">
+  </script>
+  <script>mocha.setup('tdd')</script>
+  <script src="../parser.js"></script>
+  <script src="../interpreter.js"></script>
+  <script src="test.js"></script>
+  <script>
+  var evalScheemString = function (str, env) {
+      return evalScheem(SCHEEM.parse(str), env);
+  };
+
+  suite('evalScheemString', function() {
+      test('(+ 1 2)', function() {
+          assert.deepEqual(
+              evalScheemString("(+ 1 2)", {}),
+              3
+          );
+      });
+      test("(* (car (cdr '(9 8 3 2))) 10)", function() {
+          assert.deepEqual(
+              evalScheemString("(* (car (cdr '(9 8 3 2))) 10)", {}),
+              80
+          );
+      });
+  });
+
+  </script>
+  <script>
+    $(function(){
+      mocha.run();
+    });
+  </script>
+</head>
+<body>
+  <div id="mocha"></div>
+</body>
+</html>

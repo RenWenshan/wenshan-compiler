@@ -1,0 +1,99 @@
+// parse an scheem expression
+start =
+    expression
+
+comment =
+    ";;" (!newline .)*
+
+expression =
+    single_atom
+    / parenthesis_expression
+
+single_atom =
+    space* expr:atom space*
+    {return expr;}
+
+parenthesis_expression =
+    expression_4
+    / expression_1
+    / expression_2
+    / expression_3
+
+// simple expressions like (a b c)
+expression_1 =
+    space* '(' space* expr:expression space* ')' space*
+    {return expr;}
+
+// expressions with uesless parenthesis, such as ((a b c))
+expression_2 =
+    space* '(' space* atoms:atomlist space* ')' space*
+    {return atoms;}
+
+// normal expressions, contains atoms and expressions
+expression_3 =
+    space* '(' space* left:atomlist space* expr:expression* space* right:atomlist space* ')' space*
+    {return left.concat(expr).concat(right);}
+
+// quote expression
+expression_4 =
+    space* quote expr: expression space*
+    {return ["quote", expr]}
+
+validchar =
+    [0-9a-zA-Z_?!+\-=@#$%^&*/.]
+
+space =
+    whitespace
+    / table
+    / newline
+    / comment
+
+
+whitespace =
+    ' '
+
+table =
+    [\t]
+
+newline =
+    [\r\n]
+
+atom =
+    number
+    / string
+
+number =
+    float_num
+    / integer
+
+float_num =
+    "0." rest:decimal_digit+
+    {return parseFloat("0." + rest.join(""));}
+    / first:non_zero_digit second:decimal_digit* "." rest:decimal_digit+
+    {return parseFloat(first + second.join("") + "." + rest.join(""));}
+
+integer =
+    "0" {return 0;}
+    / first:non_zero_digit rest:decimal_digit*
+    {return parseInt(first + rest.join(""));}
+
+decimal_digit
+  = [0-9]
+
+non_zero_digit
+  = [1-9]
+
+string =
+    chars:validchar+
+    {return chars.join("");}
+
+spaceatom =
+    space+ second:atom
+    {return second;}
+
+atomlist =
+    atoms:spaceatom*
+    {return atoms;}
+
+quote =
+    "'"
