@@ -5,7 +5,7 @@ var assert = require("assert");
 var fs = require("fs");         // for loading files
 
 // read file contents
-var data = fs.readFileSync("scheem.peg", "utf-8");
+var data = fs.readFileSync("../scheem.peg", "utf-8");
 
 // create scheem parser
 var parse = PEG.buildParser(data).parse;

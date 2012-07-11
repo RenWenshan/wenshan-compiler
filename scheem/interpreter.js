@@ -14,88 +14,213 @@ var evalScheem = function (expr, env) {
 
     // Strings are variable references
     if (typeof expr === 'string') {
-        return env[expr];
+        if (!env[expr]) {
+            throw new Error("Can't find " + expr + " in env." );
+        } else if (typeof env[expr] != 'number') {
+            throw new Error(
+                "env[" + expr + "] is a " + typeof(env[expr]) + ", expected a number." );
+        } else {
+            return env[expr];
+        }
     }
 
     // Look at head of list for operation
     switch (expr[0]) {
 
     case '+':
-        return evalScheem(expr[1], env) +
-            evalScheem(expr[2], env);
+        if (expr.length != 3) {
+            throw new Error(
+                "Operator '+' expected 2 operands, " + (expr.length-1) + " were given." );
+            break;
+        } else {
+            return evalScheem(expr[1], env) +
+                evalScheem(expr[2], env);
+        }
+
     case '-':
-        return evalScheem(expr[1], env) -
-            evalScheem(expr[2], env);
+        if (expr.length != 3) {
+            throw new Error(
+                "Operator '-' expected 2 operands, " + (expr.length-1) + " were given." );
+            break;
+        } else {
+            return evalScheem(expr[1], env) -
+                evalScheem(expr[2], env);
+        }
+
     case '*':
-        return evalScheem(expr[1], env) *
-            evalScheem(expr[2], env);
+        if (expr.length != 3) {
+            throw new Error(
+                "Operator '*' expected 2 operands, " + (expr.length-1) + " were given." );
+            break;
+        } else {
+            return evalScheem(expr[1], env) *
+                evalScheem(expr[2], env);
+        }
+
     case '/':
-        return evalScheem(expr[1], env) /
-            evalScheem(expr[2], env);
+        if (expr.length != 3) {
+            throw new Error(
+                "Operator '/' expected 2 operands, " + (expr.length-1) + " were given." );
+            break;
+        } else {
+            return evalScheem(expr[1], env) /
+                evalScheem(expr[2], env);
+        }
 
     case 'quote':
-        return expr[1];
+        if (expr.length != 2) {
+            throw new Error(
+                "quote expected 1 expression, " + (expr.length-1) + " were given." );
+            break;
+        } else {
+            return expr[1];
+        }
 
     case 'define':              // create a new variable
-        env[expr[1]] = evalScheem(expr.slice(2), env);
-        return 0;
+        if (expr.length != 3) {
+            throw new Error(
+                "define expected 2 parameters, " + (expr.length-1) + " were given." );
+            break;
+        } else {
+            env[expr[1]] = evalScheem(expr.slice(2), env);
+            return 0;
+        }
 
     case 'set!':                // update a variabl
-        env[expr[1]] = evalScheem(expr.slice(2), env);
-        return 0;
+        if (expr.length != 3) {
+            throw new Error(
+                "set! expected 2 parameters, " + (expr.length-1) + " were given." );
+            break;
+        } else {
+            env[expr[1]] = evalScheem(expr.slice(2), env);
+            return 0;
+        }
 
     case 'begin':
-        var i = 0;
-        var exprstack = expr.slice(1);
-        for (i = 0; i < exprstack.length - 1; i++) {
-            evalScheem(exprstack[i], env);
+        if (expr.length < 2) {
+            throw new Error(
+                "begin expected at least 1 expression, 0 was given." );
+            break;
+        } else {
+            var i = 0;
+            var exprstack = expr.slice(1);
+            for (i = 0; i < exprstack.length - 1; i++) {
+                evalScheem(exprstack[i], env);
+            }
+            return evalScheem(exprstack[i], env);
         }
-        return evalScheem(exprstack[i], env);
 
     case '=':
-        var eq = (
-            evalScheem(expr[1], env) ===
-                evalScheem(expr[2], env)
-        );
+        if (expr.length != 3) {
+            throw new Error(
+                "'=' expected 2 expressions, " + (expr.length-1) + " were given." );
+            break;
+        } else {
+            var eq = (
+                evalScheem(expr[1], env) ===
+                    evalScheem(expr[2], env)
+            );
 
-        if (eq) return '#t';
-        else return '#f';
+            if (eq) return '#t';
+            else return '#f';
+        }
 
     case '<':
-        var lt = (
-            evalScheem(expr[1], env) <
-                evalScheem(expr[2], env)
-        );
+        if (expr.length != 3) {
+            throw new Error(
+                "'<' expected 2 expressions, " + (expr.length-1) + " were given." );
+            break;
+        } else {
 
-        if (lt) return '#t';
-        else return '#f';
+            var lt = (
+                evalScheem(expr[1], env) <
+                    evalScheem(expr[2], env)
+            );
+
+            if (lt) return '#t';
+            else return '#f';
+        }
 
     case '>':
-        var gt = (
-            evalScheem(expr[1], env) >
-                evalScheem(expr[2], env)
-        );
-
-        if (gt) return '#t';
-        else return '#f';
+        if (expr.length != 3) {
+            throw new Error(
+                "'>' expected 2 expressions, " + (expr.length-1) + " were given." );
+            break;
+        } else {
+            var gt = (
+                evalScheem(expr[1], env) >
+                    evalScheem(expr[2], env)
+            );
+            if (gt) return '#t';
+            else return '#f';
+        }
 
     case 'cons':
-        var second = evalScheem(expr[2]);
-        var first = evalScheem(expr[1]);
-        second.unshift(first);
-        return second;
+        if (expr.length != 3) {
+            throw new Error(
+                "'cons' expected 2 lists, " + (expr.length-1) + " were given." );
+            break;
+        } else {
+            var second = evalScheem(expr[2]);
+            var first = evalScheem(expr[1]);
+            second.unshift(first);
+            return second;
+        }
 
     case  'car':
-        return evalScheem(expr[1])[0];
+        if (expr.length != 2) {
+            throw new Error(
+                "'car' expected only 1 list, " + (expr.length-1) + " were given." );
+            break;
+        } else {
+            var res = evalScheem(expr[1]);
+            if (res.length === 0) { // empty res
+                throw new Error(
+                    "'car' expected a list with at least 1 element, a length "
+                        + res.length + " list was given." );
+                break;
+            } else {
+                return res[0];
+            }
+        }
 
     case 'cdr':
-        return evalScheem(expr[1]).slice(1);
+        if (expr.length != 2) {
+            throw new Error(
+                "'cdr' expected 1 list, " + (expr.length-1) + " were given." );
+            break;
+        } else {
+            var res = evalScheem(expr[1]);
+            if (res.length === 0) {
+                throw new Error(
+                    "'cdr' expected a list with at least 1 element, a length "
+                        + res.length + " list was given." );
+                break;
+            } else {
+                return evalScheem(expr[1]).slice(1);
+            }
+        }
 
     case 'if':
-        if (evalScheem(expr[1]) === '#t') {
-            return evalScheem(expr[2]);
+        if (expr.length != 4) {
+            throw new Error(
+                "'if' expected 3 parameters, " + (expr.length-1) + " were given." );
+            break;
+        } else {
+            var res = evalScheem(expr[1]);
+            if (res === '#t') {
+                return evalScheem(expr[2]);
+            } else if (res === '#f') {
+                return evalScheem(expr[3]);
+            } else {
+                throw new Error(
+                    "'if' expected the first parameter to be #t or #f, "
+                        + res + " was given." );
+                break;
+            }
         }
-        return evalScheem(expr[3]);
 
+    default:                    // unknown operation
+        throw new Error('Unkown operation: ' + expr[0]);
     }
 };
