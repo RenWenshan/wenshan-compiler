@@ -216,8 +216,12 @@ var evalScheem = function (expr, env) {
 
     default:                    // function call
         var func = evalScheem(expr[0], env);
-        var arg = evalScheem(expr[1], env);
-        return func(arg);
+        var args = [];
+        for (var i = 1; i < expr.length; i++) {
+            args.push(evalScheem(expr[i], env));
+        }
+        console.log(args);
+        return func.apply(null, args);
     }
 };
 

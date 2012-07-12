@@ -350,7 +350,7 @@ suite('parse', function() {
 
 // function application tests
 suite('function application', function() {
-    test('add one', function() {
+    test('one argument function', function() {
         var add_one = function(arg) {
             return arg + 1;
         };
@@ -363,6 +363,62 @@ suite('function application', function() {
         assert.deepEqual(
             evalScheem(['add_one', 9], env),
             10
+        );
+    });
+
+    test('two arguments function', function() {
+        var add_one = function(arg) {
+            return arg + 1;
+        };
+        var multiple = function(x, y) {
+            return x * y;
+        };
+        var env = {
+            bindings: {
+                'multiple': multiple,
+                'add_one': add_one
+            },
+            outer: {}
+        };
+        assert.deepEqual(
+            evalScheem(['multiple', ['add_one', 9], 5], env),
+            50
+        );
+    });
+
+    test('four arguments function', function() {
+        var f = function (a, b, c, d) {
+            return (a - b + c * d);
+        };
+
+        var env = {
+            bindings: {
+                'f': f
+            },
+            outer: {}
+        };
+        assert.deepEqual(
+            evalScheem(['f', 9, 7, 3, 4, 9], env),
+            14
+        );
+    });
+
+    test('recursive function', function() {
+        var fact = function (n) {
+            if (n === 1 || n === 2) {
+                return 1;
+            }
+            return n * fact(n-1);
+        };
+        var env = {
+            bindings: {
+                'fact': fact
+            },
+            outer: {}
+        };
+        assert.deepEqual(
+            evalScheem(['fact', 5], env),
+            60
         );
     });
 });
