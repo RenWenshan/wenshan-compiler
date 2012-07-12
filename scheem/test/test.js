@@ -45,14 +45,21 @@ suite('arithmetic', function() {
 
 suite('references', function() {
     test('read', function() {
-        var env = {a: 10, b: -5}
+        var env = {
+            bindings: {a: 10, b: -5},
+            outer: {}
+        };
         assert.deepEqual(
             evalScheem(['*', 'a', ['+', 'b', -3]], env),
             -80
         );
     });
     test('update', function() {
-        var env = {a: 10, b: -5}
+        var env = {
+            bindings: {a: 10, b: -5},
+            outer: {}
+        };
+
         evalScheem(['set!', 'a', ['/', 'a', 2]], env);
         assert.deepEqual(
             evalScheem(['*', 'a', -8], env),
@@ -60,9 +67,13 @@ suite('references', function() {
         );
     });
     test('create', function() {
-        var env = {a: 10, b: -5}
+        var env = {
+            bindings: {a: 10, b: -5},
+            outer: {}
+        };
+
         evalScheem(['define', 'c', 100], env);
-        assert.deepEqual(env.c, 100);
+        assert.deepEqual(lookup(env, 'c'), 100);
     });
 });
 
@@ -74,7 +85,10 @@ suite('begin', function() {
                    ['set!', 'x', ['+', 'x', 1]],
                    ['+', 'x', 'a']];
 
-        var env = {a:2, b:7};
+        var env = {
+            bindings: {a:2, b:7},
+            outer: {}
+        };
         assert.deepEqual(
             evalScheem(prg, env),
             8

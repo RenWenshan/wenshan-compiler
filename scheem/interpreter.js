@@ -1,5 +1,6 @@
-// evalScheem(), which is a interpreter of parsed Scheem expressions
-
+/**
+ * The interpreter of parsed Scheem expressions
+ */
 var evalScheem = function (expr, env) {
     // Length 1 array
     if (typeof expr === 'object' &&
@@ -14,14 +15,7 @@ var evalScheem = function (expr, env) {
 
     // Strings are variable references
     if (typeof expr === 'string') {
-        if (!env[expr]) {
-            throw new Error("Can't find " + expr + " in env." );
-        } else if (typeof env[expr] != 'number') {
-            throw new Error(
-                "env[" + expr + "] is a " + typeof(env[expr]) + ", expected a number." );
-        } else {
-            return env[expr];
-        }
+        return lookup(env, expr);
     }
 
     // Look at head of list for operation
@@ -82,7 +76,7 @@ var evalScheem = function (expr, env) {
                 "define expected 2 parameters, " + (expr.length-1) + " were given." );
             break;
         } else {
-            env[expr[1]] = evalScheem(expr.slice(2), env);
+            add_binding(env, expr[1], evalScheem(expr.slice(2), env));
             return 0;
         }
 
@@ -92,7 +86,7 @@ var evalScheem = function (expr, env) {
                 "set! expected 2 parameters, " + (expr.length-1) + " were given." );
             break;
         } else {
-            env[expr[1]] = evalScheem(expr.slice(2), env);
+            update(env, expr[1], evalScheem(expr.slice(2), env));
             return 0;
         }
 
@@ -225,4 +219,43 @@ var evalScheem = function (expr, env) {
     }
 };
 
+/**
+ * Get the value of a variable
+ */
+var lookup = function (env, v) {
+    // not found
+    if (!(env.hasOwnProperty('bindings'))) {
+        throw new Error(v + " not found");
+    }
+    // base step
+    if (env.bindings.hasOwnProperty(v)) {
+        return env.bindings[v];
+    }
+    // recursive step
+    return lookup(env.outer, v);
+};
 
+/**
+ * Update a variable
+ */
+var update = function (env, v, val) {
+    if (!(env.hasOwnProperty('bindings'))) {
+        // empty env
+        env.bindings = {};
+        env.outer = {};
+        env.bindings[v] = val;
+        return;
+    }
+    if (env.bindings.hasOwnProperty(v)) {
+        env.bindings[v] = val;
+        return;
+    }
+    update(env.outer, v, val);
+};
+
+/**
+ * Add a new binding
+ */
+var add_binding = function (env, v, val) {
+    env.bindings[v] = val;
+}
