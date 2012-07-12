@@ -348,3 +348,21 @@ suite('parse', function() {
     });
 });
 
+// function application tests
+suite('function application', function() {
+    test('add one', function() {
+        var add_one = function(arg) {
+            return arg + 1;
+        };
+        var env = {
+            bindings: {
+                'add_one': add_one
+            },
+            outer: {}
+        };
+        assert.deepEqual(
+            evalScheem(['add_one', 9], env),
+            10
+        );
+    });
+});

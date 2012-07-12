@@ -214,8 +214,10 @@ var evalScheem = function (expr, env) {
             }
         }
 
-    default:                    // unknown operation
-        throw new Error('Unkown operation: ' + expr[0]);
+    default:                    // function call
+        var func = evalScheem(expr[0], env);
+        var arg = evalScheem(expr[1], env);
+        return func(arg);
     }
 };
 
