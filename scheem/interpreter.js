@@ -214,13 +214,23 @@ var evalScheem = function (expr, env) {
             }
         }
 
+    case 'lambda-one':
+        return function(arg)  {
+            var bnd = {};
+            bnd[expr[1]] = arg;
+            var newenv = {
+                bindings: bnd,
+                outer: env
+            };
+            return evalScheem(expr[2], newenv);
+        };
+
     default:                    // function call
         var func = evalScheem(expr[0], env);
         var args = [];
         for (var i = 1; i < expr.length; i++) {
             args.push(evalScheem(expr[i], env));
         }
-        console.log(args);
         return func.apply(null, args);
     }
 };

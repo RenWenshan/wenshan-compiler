@@ -39,7 +39,7 @@ suite('arithmetic', function() {
         assert.deepEqual(
             evalScheem(['/', ['*', 2, ['+', 100, 1]], -2], {}),
             -101
-        )
+        );
     });
 });
 
@@ -103,58 +103,58 @@ suite('= < > cons car cdr', function() {
         assert.deepEqual(
             evalScheem(['=', 3, ['-', 4, 1]], {}),
             '#t'
-        )
+        );
     });
     test('unequal to', function() {
         assert.deepEqual(
             evalScheem(['=', 3, ['*', 4, 1]], {}),
             '#f'
-        )
+        );
     });
     test('less than', function() {
         assert.deepEqual(
             evalScheem(['<', 1024, ['/', 9069, 3]], {}),
             '#t'
-        )
+        );
     });
     test('not less than', function() {
         assert.deepEqual(
             evalScheem(['<', ['*', 2, 4500], ['/', 9069, 3]], {}),
             '#f'
-        )
+        );
     });
     test('larger than', function() {
         assert.deepEqual(
             evalScheem(['>', ['+', 1000, 3000], ['/', 9069, 3]], {}),
             '#t'
-        )
+        );
     });
     test('not larger than', function() {
         assert.deepEqual(
             evalScheem(['>', ['*', 2, 1500], ['/', 9069, 3]], {}),
             '#f'
-        )
+        );
     });
 
     test('cons', function() {
         assert.deepEqual(
             evalScheem(['cons', ['quote', ['hello', 2, 1500]], ['quote', ['hah', 'no worries']]], {}),
             [['hello', 2, 1500], 'hah', 'no worries']
-        )
+        );
     });
 
     test('car', function() {
         assert.deepEqual(
             evalScheem(['car', ['quote', ['hello', 2, 1500]]], {}),
             'hello'
-        )
+        );
     });
 
     test('cdr', function() {
         assert.deepEqual(
             evalScheem(['cdr', ['quote', ['hello', 'world', 'now']]], {}),
             ['world', 'now']
-        )
+        );
     });
 });
 
@@ -327,7 +327,7 @@ suite('parse', function() {
             SCHEEM.parse("(+ 2 3)"),
             ['+', 2, 3]
         );
-    })
+    });
     test('an expression contains expressions', function() {
         assert.deepEqual(
             SCHEEM.parse('(* (+ 1 3) (/ 2 (- 8 9)))'),
@@ -419,6 +419,37 @@ suite('function application', function() {
         assert.deepEqual(
             evalScheem(['fact', 5], env),
             60
+        );
+    });
+});
+
+
+// lambda tests
+suite('lambda one', function() {
+    test('simple return', function() {
+        assert.deepEqual(
+            evalScheem([['lambda-one', 'x', 'x'], 5], {}),
+            5
+        );
+    });
+    test('+1', function() {
+        assert.deepEqual(
+            evalScheem([['lambda-one', 'x', ['+', 'x', 1]], 5], {}),
+            6
+        );
+    });
+    test('addition', function() {
+        assert.deepEqual(
+            evalScheem([[['lambda-one', 'x',
+                         ['lambda-one', 'y', ['+', 'x', 'y']]], 5], 3], {}),
+            8
+        );
+    });
+    test('complex lambda-one', function() {
+        assert.deepEqual(
+            evalScheem([[['lambda-one', 'x',
+                          ['lambda-one', 'x', ['+', 'x', 'x']]], 5], 3], {}),
+            6
         );
     });
 });
