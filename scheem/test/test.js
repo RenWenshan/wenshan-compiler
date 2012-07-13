@@ -219,6 +219,12 @@ suite('exceptions', function() {
         });
     });
 
+    test('/ divide 0', function() {
+        assert.throws(function () {
+            evalScheem(['/', 1024, 0], {});
+        })
+    });
+
     test('quote more than one expression', function() {
         assert.throws(function () {
             evalScheem(['quote', [1, 2, 3], 9], {});
