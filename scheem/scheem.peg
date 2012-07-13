@@ -61,15 +61,15 @@ number =
     / integer
 
 float_num =
-    "0." rest:decimal_digit+
-    {return parseFloat("0." + rest.join(""));}
-    / first:non_zero_digit second:decimal_digit* "." rest:decimal_digit+
-    {return parseFloat(first + second.join("") + "." + rest.join(""));}
+    first:[+-]? second:"0." rest:decimal_digit+
+    {return parseFloat(first + second + rest.join(""));}
+    / first:[+-]? second:non_zero_digit third:decimal_digit* "." rest:decimal_digit+
+    {return parseFloat(first + second + third.join("") + "." + rest.join(""));}
 
 integer =
-    "0" {return 0;}
-    / first:non_zero_digit rest:decimal_digit*
-    {return parseInt(first + rest.join(""));}
+    first:[+-]? second:"0" {return parseInt(first + second);}
+    / first:[+-]? second:non_zero_digit rest:decimal_digit*
+    {return parseInt(first + second + rest.join(""));}
 
 decimal_digit
   = [0-9]

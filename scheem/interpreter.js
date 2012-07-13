@@ -9,7 +9,7 @@ var evalScheem = function (expr, env) {
     // init the environment
     if (!lookup(env, '+')) {
         var func_add = function () {
-            if (arguments.length != 2) {
+            if (arguments.length !== 2) {
                 throw new Error(
                     "Operator '+' expects 2 arguments , given " + (expr.length-1));
             }
@@ -21,7 +21,7 @@ var evalScheem = function (expr, env) {
     }
     if (!lookup(env, '-')) {
         var func_sub = function () {
-            if (arguments.length != 2) {
+            if (arguments.length !== 2) {
                 throw new Error(
                     "Operator '-' expects 2 arguments, given " + (expr.length-1));
             }
@@ -33,7 +33,7 @@ var evalScheem = function (expr, env) {
     }
     if (!lookup(env, '*')) {
         var func_mul = function () {
-            if (arguments.length != 2) {
+            if (arguments.length !== 2) {
                 throw new Error(
                     "Operator '*' expects 2 arguments, given " + (expr.length-1));
             }
@@ -45,7 +45,7 @@ var evalScheem = function (expr, env) {
     }
     if (!lookup(env, '/')) {
         var func_div = function () {
-            if (arguments.length != 2) {
+            if (arguments.length !== 2) {
                 throw new Error(
                     "Operator '/' expects 2 arguments, given " + (expr.length-1));
             }
@@ -61,7 +61,7 @@ var evalScheem = function (expr, env) {
     }
     if (!lookup(env, '=')) {
         var func_equal = function () {
-            if (arguments.length != 2) {
+            if (arguments.length !== 2) {
                 throw new Error(
                     "'=' expects 2 arguments, given " + (expr.length-1));
             }
@@ -74,7 +74,7 @@ var evalScheem = function (expr, env) {
     }
     if (!lookup(env, '<')) {
         var func_lt = function () {
-            if (arguments.length != 2) {
+            if (arguments.length !== 2) {
                 throw new Error(
                     "'<' expects 2 arguments, given " + (expr.length-1));
             }
@@ -87,7 +87,7 @@ var evalScheem = function (expr, env) {
     }
     if (!lookup(env, '>')) {
         var func_gt = function () {
-            if (arguments.length != 2) {
+            if (arguments.length !== 2) {
                 throw new Error(
                     "'>' expects 2 arguments, given " + (expr.length-1));
             }
@@ -100,7 +100,7 @@ var evalScheem = function (expr, env) {
     }
     if (!lookup(env, '<=')) {
         var func_le = function () {
-            if (arguments.length != 2) {
+            if (arguments.length !== 2) {
                 throw new Error(
                     "'<=' expects 2 arguments, given " + (expr.length-1));
             }
@@ -113,7 +113,7 @@ var evalScheem = function (expr, env) {
     }
     if (!lookup(env, '>=')) {
         var func_ge = function () {
-            if (arguments.length != 2) {
+            if (arguments.length !== 2) {
                 throw new Error(
                     "'>=' expects 2 arguments, given " + (expr.length-1));
             }
@@ -126,13 +126,13 @@ var evalScheem = function (expr, env) {
     }
     if (!lookup(env, 'cons')) {
         var func_cons = function () {
-            if (arguments.length != 2) {
+            if (arguments.length !== 2) {
                 throw new Error(
                     "'cons' expects 2 arguments, given " + (expr.length-1));
             }
             var first = arguments[0];
             var second = arguments[1];
-            if (typeof second != 'object') { // second is an atom
+            if (typeof second !== 'object') { // second is an atom
                 return [first, second];
             }
             second.unshift(first);
@@ -142,12 +142,12 @@ var evalScheem = function (expr, env) {
     }
     if (!lookup(env, 'car')) {
         var func_car = function () {
-            if (arguments.length != 1) {
+            if (arguments.length !== 1) {
                 throw new Error(
                     "'car' expects 1 argument, given " + (expr.length-1));
             }
             var list = arguments[0];
-            if (typeof list != 'object') { // not a list
+            if (typeof list !== 'object') { // not a list
                 throw new Error(
                     "'car' expects a list as argument"
                 );
@@ -163,12 +163,12 @@ var evalScheem = function (expr, env) {
     }
     if (!lookup(env, 'cdr')) {
         var func_cdr = function () {
-            if (arguments.length != 1) {
+            if (arguments.length !== 1) {
                 throw new Error(
                     "'cdr' expects 1 argument, given " + (expr.length-1));
             }
             var list = arguments[0];
-            if (typeof list != 'object') { // not a list
+            if (typeof list !== 'object') { // not a list
                 throw new Error(
                     "'cdr' expects a list as argument"
                 );
@@ -181,6 +181,23 @@ var evalScheem = function (expr, env) {
             return list.slice(1);
         };
         add_binding(env, 'cdr', func_cdr);
+    }
+
+    // alert, used for debugging
+    if (!lookup(env, 'alert')) {
+        var func_alert = function () {
+            var res = "";
+            for (var i = 0; i < arguments.length; i++) {
+                res = res + arguments[i] + "\n";
+            }
+            if (typeof module !== 'undefined' && module.exports) { // node.js
+                console.log(res);
+            } else { // browser
+                alert(res);
+            }
+            return 0;
+        };
+        add_binding(env, 'alert', func_alert);
     }
     // eval
     return evalScheem_help(expr, env);
@@ -208,7 +225,7 @@ var evalScheem_help = function (expr, env) {
     // Look at head of list for operation
     switch (expr[0]) {
     case 'quote':
-        if (expr.length != 2) {
+        if (expr.length !== 2) {
             throw new Error(
                 "quote expected 1 expression, " + (expr.length-1) + " were given." );
         } else {
@@ -217,7 +234,7 @@ var evalScheem_help = function (expr, env) {
         break;
 
     case 'define':              // create a new variable
-        if (expr.length != 3) {
+        if (expr.length !== 3) {
             throw new Error(
                 "define expected 2 parameters, " + (expr.length-1) + " were given." );
         } else {
@@ -227,7 +244,7 @@ var evalScheem_help = function (expr, env) {
         break;
 
     case 'set!':                // update a variabl
-        if (expr.length != 3) {
+        if (expr.length !== 3) {
             throw new Error(
                 "set! expected 2 parameters, " + (expr.length-1) + " were given." );
         } else {
@@ -251,7 +268,7 @@ var evalScheem_help = function (expr, env) {
         break;
 
     case 'if':
-        if (expr.length != 4) {
+        if (expr.length !== 4) {
             throw new Error(
                 "'if' expected 3 parameters, " + (expr.length-1) + " were given." );
         } else {

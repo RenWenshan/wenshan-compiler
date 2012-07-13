@@ -41,6 +41,15 @@ suite('arithmetic', function() {
             -101
         );
     });
+    test('negative integer and float', function() {
+        var parsed = SCHEEM.parse(
+            "(+ -1.5 (* -9 1.1))"
+        );
+        assert.deepEqual(
+            evalScheem(parsed, {}),
+            -11.4
+        );
+    });
 });
 
 suite('references', function() {
