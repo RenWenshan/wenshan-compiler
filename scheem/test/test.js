@@ -453,3 +453,168 @@ suite('lambda one', function() {
         );
     });
 });
+
+// lambda tests
+suite('lambda', function() {
+    test('simple return', function() {
+        assert.deepEqual(
+            evalScheem([['lambda', ['x'], 'x'], 5], {}),
+            5
+        );
+    });
+    test('+1', function() {
+        assert.deepEqual(
+            evalScheem([['lambda', ['x'], ['+', 'x', 1]], 5], {}),
+            6
+        );
+    });
+    test('addition', function() {
+        assert.deepEqual(
+            evalScheem([['lambda', ['x', 'y'], ['+', 'x', 'y']], 3, 5], {}),
+            8
+        );
+    });
+    test('four arguments lambda', function() {
+        assert.deepEqual(
+            evalScheem([['lambda', ['x', 'y', 'z', 'h'],
+                         ['+', 'x', ['*', ['-', 'y', 'z'], 'h']]], 1, 2, 3, 4], {}),
+                -3
+        );
+    });
+});
+
+// function tests
+suite('function', function() {
+    test('define and call a simple function (addition)', function() {
+        var parsed = SCHEEM.parse("(begin \n" +
+                                  "(define add (lambda(x y) (+ x y)))    ;; define add function \n" +
+                                  "(add 1021 3)                          ;; call the function \n" +
+                                  ")");
+        var res = evalScheem(parsed, {});
+        assert.deepEqual(
+            res,
+            1024
+        );
+    });
+
+    test('call an anonymous function', function() {
+        var parsed = SCHEEM.parse("((lambda (x y) (* x y)) \n" +
+                                  " 2 8 )");
+        var res = evalScheem(parsed, {});
+        assert.deepEqual(
+            res,
+            16
+        );
+    });
+
+    test('pass a function as value to another function', function() {
+        var parsed = SCHEEM.parse("(begin \n" +
+                                  " (define mul (lambda (x y) (* x y)))    ;; define mul function \n" +
+                                  " (define f (lambda (ff x y) (ff x y))) \n" +
+                                  " (f mul 9 8) \n" +
+                                  ")");
+
+        var res = evalScheem(parsed, {});
+        assert.deepEqual(
+            res,
+            72
+        );
+    });
+
+    test('inner function uses values from enclosing function', function() {
+        var parsed = SCHEEM.parse(
+            "(begin \n" +
+                "(define make-account \n" +
+                "(lambda (balance) \n" +
+                "      (lambda (amt) \n" +
+                "        (begin (set! balance (+ balance amt)) \n" +
+                "               balance)))) \n" +
+                "  (define a (make-account 1024)) \n" +
+                "  (a 20) \n" +
+                ")"
+        );
+
+        var res = evalScheem(parsed, {});
+        assert.deepEqual(
+            res,
+            1044
+        );
+    });
+
+    test('argument to a function shadows a global variable', function() {
+        var parsed = SCHEEM.parse(
+            "(begin \n" +
+                "  (define x 1024) \n" +
+                "  (define f \n" +
+                "    (lambda (x y) \n" +
+                "      (+ x y) \n" +
+                "      )) \n" +
+                "  (f 1 2) \n" +
+                ") \n"
+        );
+
+        var res = evalScheem(parsed, {});
+        assert.deepEqual(
+            res,
+            3
+        );
+    });
+
+    test('a function modifies a global variable', function() {
+        var parsed = SCHEEM.parse(
+            "(begin \n" +
+                "  (define x 1024) \n" +
+                "  (define f \n" +
+                "    (set! x (/ x 2)) \n" +
+                "    ) \n" +
+                "  x \n" +
+                ") \n"
+        );
+
+        var res = evalScheem(parsed, {});
+        assert.deepEqual(
+            res,
+            512
+        );
+    });
+
+    test('a function in a define that calls itself recursively', function() {
+        var parsed = SCHEEM.parse(
+            "(begin \n" +
+                "  (define factorial \n" +
+                "    (lambda (n) \n" +
+                "      (if (= n 0) \n" +
+                "          1 \n" +
+                "          (* n (factorial (- n 1)))))) \n" +
+                "  (factorial 5)) \n"
+        );
+
+        var res = evalScheem(parsed, {});
+        assert.deepEqual(
+            res,
+            120
+        );
+    });
+    test('an inner function modifies a variable in the outer function', function() {
+        var parsed = SCHEEM.parse(
+            "(begin \n" +
+                "  (define fo \n" +
+                "    (lambda (x) \n" +
+                "      (begin \n" +
+                "        (define var 100) \n" +
+                "        (define fi \n" +
+                "          (lambda (x) \n" +
+                "            (set! var (/ var x)))) \n" +
+                "        (fi x) \n" +
+                "        var))) \n" +
+                "  (fo 5)) \n"
+        );
+
+        var res = evalScheem(parsed, {});
+        assert.deepEqual(
+            res,
+            20
+        );
+    });
+});
+

@@ -14,28 +14,22 @@ single_atom =
     {return expr;}
 
 parenthesis_expression =
-    expression_4
+    expression_3
     / expression_1
     / expression_2
-    / expression_3
 
-// simple expressions like (a b c)
+// simple expression
 expression_1 =
-    space* '(' space* expr:expression space* ')' space*
-    {return expr;}
-
-// expressions with uesless parenthesis, such as ((a b c))
-expression_2 =
     space* '(' space* atoms:atomlist space* ')' space*
     {return atoms;}
 
 // normal expressions, contains atoms and expressions
-expression_3 =
+expression_2 =
     space* '(' space* left:atomlist space* expr:expression* space* right:atomlist space* ')' space*
     {return left.concat(expr).concat(right);}
 
 // quote expression
-expression_4 =
+expression_3 =
     space* quote expr: expression space*
     {return ["quote", expr]}
 
