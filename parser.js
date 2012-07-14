@@ -649,33 +649,48 @@ SCHEEM = (function(){
       }
       
       function parse_float_num() {
-        var result0, result1, result2, result3, result4;
+        var result0, result1, result2, result3, result4, result5;
         var pos0, pos1;
         
         pos0 = pos;
         pos1 = pos;
-        if (input.substr(pos, 2) === "0.") {
-          result0 = "0.";
-          pos += 2;
+        if (/^[+\-]/.test(input.charAt(pos))) {
+          result0 = input.charAt(pos);
+          pos++;
         } else {
           result0 = null;
           if (reportFailures === 0) {
-            matchFailed("\"0.\"");
+            matchFailed("[+\\-]");
           }
         }
+        result0 = result0 !== null ? result0 : "";
         if (result0 !== null) {
-          result2 = parse_decimal_digit();
-          if (result2 !== null) {
-            result1 = [];
-            while (result2 !== null) {
-              result1.push(result2);
-              result2 = parse_decimal_digit();
-            }
+          if (input.substr(pos, 2) === "0.") {
+            result1 = "0.";
+            pos += 2;
           } else {
             result1 = null;
+            if (reportFailures === 0) {
+              matchFailed("\"0.\"");
+            }
           }
           if (result1 !== null) {
-            result0 = [result0, result1];
+            result3 = parse_decimal_digit();
+            if (result3 !== null) {
+              result2 = [];
+              while (result3 !== null) {
+                result2.push(result3);
+                result3 = parse_decimal_digit();
+              }
+            } else {
+              result2 = null;
+            }
+            if (result2 !== null) {
+              result0 = [result0, result1, result2];
+            } else {
+              result0 = null;
+              pos = pos1;
+            }
           } else {
             result0 = null;
             pos = pos1;
@@ -685,7 +700,7 @@ SCHEEM = (function(){
           pos = pos1;
         }
         if (result0 !== null) {
-          result0 = (function(offset, rest) {return parseFloat("0." + rest.join(""));})(pos0, result0[1]);
+          result0 = (function(offset, first, second, rest) {return parseFloat(first + second + rest.join(""));})(pos0, result0[0], result0[1], result0[2]);
         }
         if (result0 === null) {
           pos = pos0;
@@ -693,37 +708,52 @@ SCHEEM = (function(){
         if (result0 === null) {
           pos0 = pos;
           pos1 = pos;
-          result0 = parse_non_zero_digit();
-          if (result0 !== null) {
-            result1 = [];
-            result2 = parse_decimal_digit();
-            while (result2 !== null) {
-              result1.push(result2);
-              result2 = parse_decimal_digit();
+          if (/^[+\-]/.test(input.charAt(pos))) {
+            result0 = input.charAt(pos);
+            pos++;
+          } else {
+            result0 = null;
+            if (reportFailures === 0) {
+              matchFailed("[+\\-]");
             }
+          }
+          result0 = result0 !== null ? result0 : "";
+          if (result0 !== null) {
+            result1 = parse_non_zero_digit();
             if (result1 !== null) {
-              if (input.charCodeAt(pos) === 46) {
-                result2 = ".";
-                pos++;
-              } else {
-                result2 = null;
-                if (reportFailures === 0) {
-                  matchFailed("\".\"");
-                }
+              result2 = [];
+              result3 = parse_decimal_digit();
+              while (result3 !== null) {
+                result2.push(result3);
+                result3 = parse_decimal_digit();
               }
               if (result2 !== null) {
-                result4 = parse_decimal_digit();
-                if (result4 !== null) {
-                  result3 = [];
-                  while (result4 !== null) {
-                    result3.push(result4);
-                    result4 = parse_decimal_digit();
-                  }
+                if (input.charCodeAt(pos) === 46) {
+                  result3 = ".";
+                  pos++;
                 } else {
                   result3 = null;
+                  if (reportFailures === 0) {
+                    matchFailed("\".\"");
+                  }
                 }
                 if (result3 !== null) {
-                  result0 = [result0, result1, result2, result3];
+                  result5 = parse_decimal_digit();
+                  if (result5 !== null) {
+                    result4 = [];
+                    while (result5 !== null) {
+                      result4.push(result5);
+                      result5 = parse_decimal_digit();
+                    }
+                  } else {
+                    result4 = null;
+                  }
+                  if (result4 !== null) {
+                    result0 = [result0, result1, result2, result3, result4];
+                  } else {
+                    result0 = null;
+                    pos = pos1;
+                  }
                 } else {
                   result0 = null;
                   pos = pos1;
@@ -741,7 +771,7 @@ SCHEEM = (function(){
             pos = pos1;
           }
           if (result0 !== null) {
-            result0 = (function(offset, first, second, rest) {return parseFloat(first + second.join("") + "." + rest.join(""));})(pos0, result0[0], result0[1], result0[3]);
+            result0 = (function(offset, first, second, third, rest) {return parseFloat(first + second + third.join("") + "." + rest.join(""));})(pos0, result0[0], result0[1], result0[2], result0[4]);
           }
           if (result0 === null) {
             pos = pos0;
@@ -751,21 +781,43 @@ SCHEEM = (function(){
       }
       
       function parse_integer() {
-        var result0, result1, result2;
+        var result0, result1, result2, result3;
         var pos0, pos1;
         
         pos0 = pos;
-        if (input.charCodeAt(pos) === 48) {
-          result0 = "0";
+        pos1 = pos;
+        if (/^[+\-]/.test(input.charAt(pos))) {
+          result0 = input.charAt(pos);
           pos++;
         } else {
           result0 = null;
           if (reportFailures === 0) {
-            matchFailed("\"0\"");
+            matchFailed("[+\\-]");
           }
         }
+        result0 = result0 !== null ? result0 : "";
         if (result0 !== null) {
-          result0 = (function(offset) {return 0;})(pos0);
+          if (input.charCodeAt(pos) === 48) {
+            result1 = "0";
+            pos++;
+          } else {
+            result1 = null;
+            if (reportFailures === 0) {
+              matchFailed("\"0\"");
+            }
+          }
+          if (result1 !== null) {
+            result0 = [result0, result1];
+          } else {
+            result0 = null;
+            pos = pos1;
+          }
+        } else {
+          result0 = null;
+          pos = pos1;
+        }
+        if (result0 !== null) {
+          result0 = (function(offset, first, second) {return parseInt(first + second);})(pos0, result0[0], result0[1]);
         }
         if (result0 === null) {
           pos = pos0;
@@ -773,16 +825,31 @@ SCHEEM = (function(){
         if (result0 === null) {
           pos0 = pos;
           pos1 = pos;
-          result0 = parse_non_zero_digit();
-          if (result0 !== null) {
-            result1 = [];
-            result2 = parse_decimal_digit();
-            while (result2 !== null) {
-              result1.push(result2);
-              result2 = parse_decimal_digit();
+          if (/^[+\-]/.test(input.charAt(pos))) {
+            result0 = input.charAt(pos);
+            pos++;
+          } else {
+            result0 = null;
+            if (reportFailures === 0) {
+              matchFailed("[+\\-]");
             }
+          }
+          result0 = result0 !== null ? result0 : "";
+          if (result0 !== null) {
+            result1 = parse_non_zero_digit();
             if (result1 !== null) {
-              result0 = [result0, result1];
+              result2 = [];
+              result3 = parse_decimal_digit();
+              while (result3 !== null) {
+                result2.push(result3);
+                result3 = parse_decimal_digit();
+              }
+              if (result2 !== null) {
+                result0 = [result0, result1, result2];
+              } else {
+                result0 = null;
+                pos = pos1;
+              }
             } else {
               result0 = null;
               pos = pos1;
@@ -792,7 +859,7 @@ SCHEEM = (function(){
             pos = pos1;
           }
           if (result0 !== null) {
-            result0 = (function(offset, first, rest) {return parseInt(first + rest.join(""));})(pos0, result0[0], result0[1]);
+            result0 = (function(offset, first, second, rest) {return parseInt(first + second + rest.join(""));})(pos0, result0[0], result0[1], result0[2]);
           }
           if (result0 === null) {
             pos = pos0;
